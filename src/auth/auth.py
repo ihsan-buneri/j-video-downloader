@@ -7,7 +7,7 @@ from typing import Dict, Any, Optional
 from datetime import datetime, timezone, timedelta
 import jwt
 
-API_KEY = "fprime-videodownloader-junaid1374huahs7162"
+API_KEY = "jd_7mK9pL2nX8qR4vW6jY1zF3bH5tN0sA9cG7eU4xQ2wV8mP6rT1kJ3nL5h"
 API_KEY_NAME = "Authorization"
 
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=True)
