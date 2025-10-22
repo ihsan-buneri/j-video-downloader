@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Analytics Dashboard - J Video Downloader</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                background: #f5f7fa;
+                min-height: 100vh;
+            }
+
+            .header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 20px 40px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .header-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .filter-dropdown {
+                background: white;
+                border: none;
+                padding: 12px 40px 12px 18px;
+                border-radius: 10px;
+                font-size: 14px;
+                color: #333;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                outline: none;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                appearance: none;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right 12px center;
+                background-size: 18px;
+                min-width: 160px;
+            }
+
+            .filter-dropdown:hover {
+                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+                transform: translateY(-1px);
+            }
+
+            .filter-dropdown:focus {
+                box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.4);
+            }
+
+            .filter-dropdown option {
+                background: white;
+                color: #333;
+                padding: 12px 18px;
+                font-weight: 500;
+            }
+
+            .filter-dropdown option:hover {
+                background: #f0f0f0;
+            }
+
+            .filter-container {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .filter-label {
+                font-size: 14px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 30px 40px;
+            }
+
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+
+            @media (min-width: 1024px) {
+                .stats-grid {
+                    grid-template-columns: repeat(5, 1fr);
+                }
+            }
+
+            @media (min-width: 768px) and (max-width: 1023px) {
+                .stats-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+            }
+
+            @media (max-width: 767px) {
+                .stats-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .stat-card {
+                background: white;
+                padding: 25px;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                transition:
+                    transform 0.3s ease,
+                    box-shadow 0.3s ease;
+            }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            .stat-icon {
+                font-size: 32px;
+                margin-bottom: 10px;
+            }
+
+            .stat-label {
+                color: #666;
+                font-size: 14px;
+                margin-bottom: 5px;
+            }
+
+            .stat-value {
+                font-size: 32px;
+                font-weight: bold;
+                color: #333;
+            }
+
+            .stat-change {
+                font-size: 12px;
+                margin-top: 5px;
+            }
+
+            .stat-change.positive {
+                color: #22c55e;
+            }
+
+            .stat-change.negative {
+                color: #ef4444;
+            }
+
+            .stat-change.neutral {
+                color: #666;
+            }
+
+            .chart-container {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+
+            .chart-card {
+                background: white;
+                padding: 25px;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .chart-card h2 {
+                font-size: 18px;
+                color: #333;
+                margin-bottom: 20px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .chart-legend {
+                display: flex;
+                gap: 20px;
+            }
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+                /*gap: 8px;*/
+                font-size: 12px;
+                color: #666;
+            }
+
+            .legend-color {
+                width: 16px;
+                height: 16px;
+                border-radius: 4px;
+            }
+
+            .platform-chart {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 20px;
+            }
+
+            @media (min-width: 1400px) {
+                .platform-chart {
+                    grid-template-columns: repeat(10, 1fr);
+                }
+            }
+
+            @media (min-width: 1024px) and (max-width: 1399px) {
+                .platform-chart {
+                    grid-template-columns: repeat(7, 1fr);
+                }
+            }
+
+            @media (min-width: 768px) and (max-width: 1023px) {
+                .platform-chart {
+                    grid-template-columns: repeat(4, 1fr);
+                }
+            }
+
+            @media (max-width: 767px) {
+                .platform-chart {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+            }
+
+            .platform-group {
+                padding: 16px;
+                background: #f8f9fa;
+                border-radius: 12px;
+                transition: all 0.3s ease;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .platform-group:hover {
+                background: #f0f1f3;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                transform: translateY(-3px);
+            }
+
+            .platform-header {
+                margin-bottom: 15px;
+                text-align: center;
+            }
+
+            .platform-name-chart {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 6px;
+                font-size: 14px;
+                color: #333;
+            }
+
+            .platform-name-chart span:first-child {
+                font-size: 28px;
+            }
+
+            .platform-bars-container {
+                display: flex;
+                gap: 6px;
+                width: 100%;
+                justify-content: center;
+                align-items: flex-end;
+                height: 200px;
+                padding-bottom: 30px;
+                position: relative;
+            }
+
+            .platform-bar-column {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                flex: 1;
+                max-width: 28px;
+                height: 100%;
+                justify-content: flex-end;
+            }
+
+            .bar-value {
+                font-size: 11px;
+                font-weight: 700;
+                color: #333;
+                text-align: center;
+                position: absolute;
+                top: -18px;
+                left: 50%;
+                transform: translateX(-50%);
+                white-space: nowrap;
+            }
+
+            .platform-bar-track {
+                width: 100%;
+                height: 140px;
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+            }
+
+            .platform-bar-fill {
+                position: relative;
+            }
+
+            .platform-bar-fill {
+                width: 100%;
+                min-height: 5px;
+                border-radius: 6px 6px 0 0;
+                transition: height 1s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .platform-bar-column:hover .platform-bar-fill {
+                box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
+                transform: scaleX(1.1);
+            }
+
+            .bar-label {
+                font-size: 7px;
+                color: #666;
+                font-weight: 700;
+                text-transform: uppercase;
+                position: absolute;
+                bottom: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                white-space: nowrap;
+            }
+
+            .bar-total {
+                background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            }
+
+            .bar-success {
+                background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+            }
+
+            .bar-failed {
+                background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+            }
+
+            .table-container {
+                background: white;
+                padding: 25px;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                overflow-x: auto;
+            }
+
+            .table-container h2 {
+                font-size: 18px;
+                color: #333;
+                margin-bottom: 20px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            th {
+                background: #f8f9fa;
+                padding: 12px;
+                text-align: left;
+                font-weight: 600;
+                color: #555;
+                border-bottom: 2px solid #e0e0e0;
+            }
+
+            td {
+                padding: 12px;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            tr:hover {
+                background: #f8f9fa;
+            }
+
+            .status-badge {
+                padding: 4px 12px;
+                border-radius: 12px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            .status-success {
+                background: #d1fae5;
+                color: #065f46;
+            }
+
+            .status-failed {
+                background: #fee2e2;
+                color: #991b1b;
+            }
+
+            .url-cell {
+                max-width: 300px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .back-button {
+                display: inline-block;
+                padding: 10px 20px;
+                background: white;
+                color: #667eea;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+            }
+
+            .back-button:hover {
+                background: rgba(255, 255, 255, 0.9);
+                transform: translateX(-5px);
+            }
+
+            .chart-placeholder {
+                height: 200px;
+                background: linear-gradient(
+                    135deg,
+                    #667eea20 0%,
+                    #764ba220 100%
+                );
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #667eea;
+                font-weight: 600;
+            }
+
+            @media (max-width: 768px) {
+                .container {
+                    padding: 20px;
+                }
+
+                .header {
+                    padding: 15px 20px;
+                }
+
+                .chart-container {
+                    grid-template-columns: 1fr;
+                }
+
+                .header-content {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                .stat-value {
+                    font-size: 24px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <div class="header-content">
+                <h1>
+                    <span>📊</span>
+                    Analytics Dashboard
+                </h1>
+                <div style="display: flex; gap: 15px; align-items: center">
+                    <div class="filter-container">
+                        <span class="filter-label">
+                            <span>📅</span>
+                            Period:
+                        </span>
+                        <select
+                            class="filter-dropdown"
+                            id="periodFilter"
+                            onchange="handlePeriodChange()"
+                        >
+                            <option value="3days" selected>Last 3 Days</option>
+                            <option value="7days">Last 7 Days</option>
+                            <option value="1month">Last Month</option>
+                            <option value="3months">Last Quarter</option>
+                            <option value="1year">Last Year</option>
+                        </select>
+                    </div>
+                    <a href="/" class="back-button">← Back</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📥</div>
+                    <div class="stat-label">Total Download Requests</div>
+                    <div class="stat-value">{{ stats.total_requests }}</div>
+                    <div
+                        class="stat-change {{ stats.total_requests_change.direction }}"
+                    >
+                        {{ stats.total_requests_change.text }}
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-label">Successful</div>
+                    <div class="stat-value">{{ stats.successful }}</div>
+                    <div
+                        class="stat-change {{ stats.successful_change.direction }}"
+                    >
+                        {{ stats.successful_change.text }}
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">❌</div>
+                    <div class="stat-label">Failed</div>
+                    <div class="stat-value">{{ stats.failed }}</div>
+                    <div
+                        class="stat-change {{ stats.failed_change.direction }}"
+                    >
+                        {{ stats.failed_change.text }}
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-label">Success Rate</div>
+                    <div class="stat-value">{{ stats.success_rate }}%</div>
+                    <div
+                        class="stat-change {{ stats.success_rate_change.direction }}"
+                    >
+                        {{ stats.success_rate_change.text }}
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">⚡</div>
+                    <div class="stat-label">Avg Response Time</div>
+                    <div class="stat-value">{{ stats.avg_response_time }}s</div>
+                    <div
+                        class="stat-change {{ stats.avg_response_time_change.direction }}"
+                    >
+                        {{ stats.avg_response_time_change.text }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Platform Distribution Chart -->
+            <div class="chart-card" style="margin-bottom: 30px">
+                <div
+                    style="
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 25px;
+                    "
+                >
+                    <h2 style="margin: 0">🎯 Platform Distribution</h2>
+                    <div class="chart-legend">
+                        <span class="legend-item">
+                            <span
+                                class="legend-color"
+                                style="background: #667eea"
+                            ></span>
+                            Total
+                        </span>
+                        <span class="legend-item">
+                            <span
+                                class="legend-color"
+                                style="background: #22c55e"
+                            ></span>
+                            Success
+                        </span>
+                        <span class="legend-item">
+                            <span
+                                class="legend-color"
+                                style="background: #ef4444"
+                            ></span>
+                            Failed
+                        </span>
+                    </div>
+                </div>
+                <div class="platform-chart">
+                    {% for platform in platform_stats %}
+                    <div class="platform-group">
+                        <div class="platform-header">
+                            <span class="platform-name-chart">
+                                <span>{{ platform.icon }}</span>
+                                <strong>{{ platform.name }}</strong>
+                            </span>
+                        </div>
+                        <div class="platform-bars-container">
+                            <div class="platform-bar-column">
+                                <div class="platform-bar-track">
+                                    <div
+                                        class="platform-bar-fill bar-total"
+                                        style="height: {{ platform.total_percentage }}%"
+                                    >
+                                        <span class="bar-value"
+                                            >{{ platform.total }}</span
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="platform-bar-column">
+                                <div class="platform-bar-track">
+                                    <div
+                                        class="platform-bar-fill bar-success"
+                                        style="height: {{ platform.success_percentage }}%"
+                                    >
+                                        <span class="bar-value"
+                                            >{{ platform.success }}</span
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="platform-bar-column">
+                                <div class="platform-bar-track">
+                                    <div
+                                        class="platform-bar-fill bar-failed"
+                                        style="height: {{ platform.failed_percentage }}%"
+                                    >
+                                        <span class="bar-value"
+                                            >{{ platform.failed }}</span
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="bar-label" style="left: 16.66%"
+                                >Total</span
+                            >
+                            <span class="bar-label" style="left: 50%"
+                                >Success</span
+                            >
+                            <span class="bar-label" style="left: 83.33%"
+                                >Failed</span
+                            >
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Recent Downloads Table -->
+            <div class="table-container">
+                <h2>🕐 Recent Downloads</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Platform</th>
+                            <th>Title</th>
+                            <th>URL</th>
+                            <th>Status</th>
+                            <th>Response Time</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for download in recent_downloads %}
+                        <tr>
+                            <td><strong>{{ download.platform }}</strong></td>
+                            <td>{{ download.title }}</td>
+                            <td class="url-cell" title="{{ download.url }}">
+                                {{ download.url }}
+                            </td>
+                            <td>
+                                <span
+                                    class="status-badge status-{{ download.status }}"
+                                >
+                                    {{ download.status }}
+                                </span>
+                            </td>
+                            <td>{{ download.response_time }}s</td>
+                            <td>{{ download.date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <script>
+            function handlePeriodChange() {
+                const period = document.getElementById("periodFilter").value;
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set("period", period);
+
+                // Reload page with new period parameter
+                window.location.href = currentUrl.toString();
+            }
+
+            // Set dropdown to current period from URL on page load
+            window.addEventListener("DOMContentLoaded", function () {
+                const urlParams = new URLSearchParams(window.location.search);
+                const period = urlParams.get("period") || "3days";
+                document.getElementById("periodFilter").value = period;
+            });
+        </script>
+    </body>
+</html>

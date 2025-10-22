@@ -1,7 +1,7 @@
 # Multi-stage build for production optimization
 FROM python:3.12-slim as builder
 
-# Install uv.
+# Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 # Set working directory
@@ -16,6 +16,11 @@ RUN uv sync --frozen --no-cache
 # Production stage
 FROM python:3.12-slim
 
+# Install system dependencies (curl for healthcheck)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl && \
+    rm -rf /var/lib/apt/lists/*
+
 # Install uv in production image
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
@@ -25,21 +30,20 @@ WORKDIR /app
 # Copy the virtual environment from builder stage
 COPY --from=builder /app/.venv /app/.venv
 
-# Copy application code
+# Copy application code (use .dockerignore to exclude unnecessary files)
 COPY . /app
 
-
-
 # Set environment variables
-ENV PYTHONPATH=/app/src
-ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONPATH=/app \
+    PATH="/app/.venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1
 
 # Expose port
-EXPOSE 7777
+EXPOSE 8080
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:7777/health || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
 
 # Run the application
-CMD ["/app/.venv/bin/fastapi", "run", "src/main.py", "--port", "7777", "--host", "0.0.0.0"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]

@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 
 from .routes.general import general_router
+from .routes.web import web_router
 from .database.database import create_db_and_tables
 
 
@@ -43,5 +45,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Mount static files directory (for future CSS/JS files)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
-app.include_router(general_router)
+# Include routers
+app.include_router(web_router)  # Web interface routes (must be first for root route)
+app.include_router(general_router)  # API routes
+
+
+@app.get("/health")
+async def health_check():
+    """
+    Health check endpoint for Docker and monitoring systems.
+    Returns 200 OK if the application is running.
+    """
+    return {"status": "healthy", "service": "j-video-downloader"}
