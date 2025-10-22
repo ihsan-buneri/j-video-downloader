@@ -4,4 +4,16 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "requests>=2.32.0",
+    "beautifulsoup4>=4.12.0",
+    "aiohttp>=3.10.0",
+    "pyjwt>=2.8.0",
+    "bcrypt>=4.2.0",
+    "python-multipart>=0.0.9",
+    "sqlmodel>=0.0.22",
+    "psycopg2-binary>=2.9.9",
+    "python-dotenv>=1.0.0",
+]
