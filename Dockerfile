@@ -39,7 +39,7 @@ EXPOSE 7777
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:80/health || exit 1
+    CMD curl -f http://localhost:7777/health || exit 1
 
 # Run the application
 CMD ["/app/.venv/bin/fastapi", "run", "src/main.py", "--port", "7777", "--host", "0.0.0.0"]
