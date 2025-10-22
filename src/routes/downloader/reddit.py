@@ -84,7 +84,7 @@ async def download_reddit_core(url: str):
         HTTPException: If download fails
     """
 
-    print(url, "url in reddit core")
+    # print(url, "url in reddit core")
     try:
         loop = asyncio.get_event_loop()
         task_reddit2 = loop.run_in_executor(None, fetch_reddit2, url)

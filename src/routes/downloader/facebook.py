@@ -15,7 +15,7 @@ async def fetch_from_getsave(url: str):
         "Content-Type": "application/x-www-form-urlencoded",
         "User-Agent": "Mozilla/5.0",
     }
-    print(url, "url from getsave")
+    # print(url, "url from getsave")
     try:
         resp = requests.post(
             "https://getsave.net/proxy.php",
@@ -24,7 +24,7 @@ async def fetch_from_getsave(url: str):
             timeout=30,
         )
         data = resp.json()
-        print(data, "data from getsave")
+        # print(data, "data from getsave")
         title = data["api"]["title"]
         thumbnail_url = data["api"]["mediaItems"][0].get("mediaThumbnail")
 
@@ -59,7 +59,7 @@ async def fetch_from_saveas(url: str):
     }
 
     try:
-        print(url, "url from saveas")
+        # print(url, "url from saveas")
         resp = requests.post(
             "https://saveas.co/smart_download.php",
             data={"fb_url": url},
@@ -68,7 +68,7 @@ async def fetch_from_saveas(url: str):
         )
         data = resp.text
 
-        print(data, "data from saveas")
+        # print(data, "data from saveas")
         soup = BeautifulSoup(data, "html.parser")
 
         img_element = soup.select_one("img")
@@ -123,7 +123,7 @@ async def download_facebook_core(url: str):
         HTTPException: If download fails
     """
     try:
-        print(url, "url from facebook download core")
+        # print(url, "url from facebook download core")
         # Primary: try saveas.co first
         try:
             primary_result = await fetch_from_saveas(url)

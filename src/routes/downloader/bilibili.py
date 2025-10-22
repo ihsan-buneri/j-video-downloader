@@ -41,7 +41,7 @@ async def download_bilibili_core(url: str):
         soup = BeautifulSoup(init_data, "html.parser")
 
         token = soup.find("input", {"name": "token"})["value"]
-        print(token, "token")
+        # print(token, "token")
         payload = {
             "url": url,
             "token": token,
@@ -55,7 +55,7 @@ async def download_bilibili_core(url: str):
         )
 
         data = response.json()
-        print(data, "data")
+        # print(data, "data")
         title = data["title"]
         thumbnail = data["thumbnail"]
         urls = []
