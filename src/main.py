@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
+import os
 
 from .routes.general import general_router
 from .routes.web import web_router
@@ -45,8 +46,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files directory (for future CSS/JS files)
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Mount static files directory (for future CSS/JS files) - only if directory exists
+if os.path.exists("static") and os.path.isdir("static"):
+    app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Include routers
 app.include_router(web_router)  # Web interface routes (must be first for root route)
